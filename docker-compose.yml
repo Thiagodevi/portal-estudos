@@ -1,0 +1,36 @@
+services:
+
+  app:
+    build:
+      context: ./docker/php
+    container_name: portal-estudos-app
+    volumes:
+      - ./backend:/var/www/html
+    networks:
+      - portal-network
+
+  nginx:
+    image: nginx:latest
+    container_name: portal-estudos-nginx
+    ports:
+      - "8080:80"
+    volumes:
+      - ./backend:/var/www/html
+      - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf
+    depends_on:
+      - app
+    networks:
+      - portal-network
+
+  firebird:
+    image: jacobalberty/firebird:latest
+    container_name: portal-estudos-firebird
+    environment:
+      ISC_PASSWORD: masterkey
+    ports:
+      - "3050:3050"
+    networks:
+      - portal-network
+
+networks:
+  portal-network:
